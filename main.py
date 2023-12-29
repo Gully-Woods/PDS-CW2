@@ -2,11 +2,6 @@ import pandas as pd
 import geopandas as gp
 import matplotlib.pyplot as plt
 
-#load relevant data
-fp="Racial_and_Social_Equity_Composite_Index_Current.csv"
-df=pd.read_csv(fp)
-print(df)
-
 gp_fp="Racial_and_Social_Equity_Composite_Index_Current (1).geojson"
 gp_df=gp.read_file(gp_fp)
 print(gp_df)
