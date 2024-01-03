@@ -1,7 +1,9 @@
 import geopandas as gp
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import seaborn as sns
+from scipy.optimize import curve_fit
+import numpy as np
 
 gp_fp="Racial_and_Social_Equity_Composite_Index_Current (1).geojson"
 gp_df=gp.read_file(gp_fp)
@@ -39,9 +41,6 @@ for i in remaining_Quantile_cols:
     gp_df[i].replace('Second Lowest', 3, inplace=True)
     print(gp_df[i])
 
-
-
-
 '''
 -we could see how health is being affected by social and economical factors
 -we make a health score that is not a 'disadvantage score' we can call these health issues
@@ -65,13 +64,44 @@ print(gp_df_clean["HI_score"])
 
 list_int=["HI_score","POP_5_YRS_AND_OLDER","PTL_ADULT_NOLEISUREPHYSACTIV","PTL_LESS_BACHELOR_DEGREE"]
 
-fig,axs=plt.subplots(nrows=2,ncols=2,figsize=(25,25))
-axs=axs.flatten()
+fig_1,axs_1=plt.subplots(nrows=2,ncols=2,figsize=(15,15))
+axs_1=axs_1.flatten()
 
 for i in list_int:
-    gp_df_clean.plot(ax=axs[(list_int.index(i))], column=i,cmap='hot_r',legend=True)
-    axs[(list_int.index(i))].set_title(i)
-    axs[(list_int.index(i))].axis('off')
+    gp_df_clean.plot(ax=axs_1[(list_int.index(i))], column=i,cmap='hot_r',legend=True)
+    axs_1[(list_int.index(i))].set_title(i)
+    axs_1[(list_int.index(i))].axis('off')
 plt.show()
+
+#how about we use scatter plots for visulisation
+
+fig_2,axs_2=plt.subplots(nrows=2,ncols=3,figsize=(35,15))
+axs_2=axs_2.flatten()
+
+list_int_min=["POP_5_YRS_AND_OLDER","PTL_ADULT_NOLEISUREPHYSACTIV","PTL_LESS_BACHELOR_DEGREE"]
+
+for i in list_int_min:
+    sns.regplot(ax=axs_2[(list_int_min.index(i))],fit_reg=True,x="HI_score",y=i,data=gp_df_clean,order=2)
+    sns.residplot(ax=axs_2[(list_int_min.index(i))+3],x="HI_score",y=i,data=gp_df_clean,order=2)
+    axs_2[(list_int_min.index(i))].set_title(i)
+    axs_2[(list_int_min.index(i))+3].set_title('residual plot for abouve figure')
+    axs_2[(list_int_min.index(i)) + 3].set_ylabel("residual")
+plt.show()
+
+#finding out the mean absaloute error of the fit
+
+def second_order(x,c,m1,m2):
+    return c+m1*x+m2*x**2
+
+for i in list_int_min:
+    np_HV=gp_df_clean["HI_score"].values
+    pars,cov=(curve_fit(second_order,np_HV,gp_df_clean[i].values))
+    Fit=(second_order(np_HV,pars[0],pars[1],pars[2]))
+    res=np_HV-Fit
+    sqr_error=res**2
+    mean_squared_error=np.mean(sqr_error)
+    print('the mean squared error against the second order fit was', mean_squared_error, 'for the column',i)
+
+
 
 
