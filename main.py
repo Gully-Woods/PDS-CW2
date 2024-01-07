@@ -58,16 +58,16 @@ pd.set_option('display.max_columns',None)
 print(gp_df_clean.head())
 
 #making the HI score
-gp_df_clean["HI_score"]=((gp_df_clean["PCT_ADULT_WITH_OBESITY"]+gp_df_clean["PCT_ADULT_MENTALHLTHNOTGOOD"]+gp_df_clean[
-"PCT_ADULT_WITH_ASTHMA"]+gp_df_clean["PCT_ADULT_WITH_DISABILITY"])/5)
+gp_df_clean["HI_score"]=((gp_df_clean["PTL_ADULT_WITH_OBESITY"]+gp_df_clean["PTL_ADULT_MENTALHLTHNOTGOOD"]+gp_df_clean[
+"PTL_ADULT_WITH_ASTHMA"]+gp_df_clean["PTL_ADULT_WITH_DISABILITY"])/5)
 print(gp_df_clean["HI_score"])
 
 #plotting Social factors against Health Indicators
 
 #make a list of social factors
 list_int=["HI_score","POP_5_YRS_AND_OLDER","PTL_ADULT_NOLEISUREPHYSACTIV","PTL_LESS_BACHELOR_DEGREE"]
-readable_titles=["Bad health inidicators (%)","Population over 5","Adults with no leisure activity(%)",
-                 "Education less than degree(%)"]
+readable_titles=["Bad health inidicators (percentile)","Population over 5",
+                 "Adults with no leisure activity (percentile)","Education less than degree (percentile)"]
 
 #I want to make plot a chloropleth map of Seattle with subplots for all the different social issues
 fig_1,axs_1=plt.subplots(nrows=2,ncols=2,figsize=(15,15))
@@ -76,11 +76,14 @@ fig_1,axs_1=plt.subplots(nrows=2,ncols=2,figsize=(15,15))
 axs_1=axs_1.flatten()
 
 for i in list_int:
-    #make a plot by itterating through the list and finding the position by using the index
-    gp_df_clean.plot(ax=axs_1[(list_int.index(i))], column=i,cmap='hot_r',legend=True,edgecolor='black')
+    #A variable to give a value of how far through the list we are
+    pos=(list_int.index(i))
+    #make a plot by itterating through the list
+    gp_df_clean.plot(ax=axs_1[pos], column=i,cmap='hot_r',legend=True,edgecolor='black')
     #give the plots readable titles
-    axs_1[(list_int.index(i))].set_title(readable_titles[(list_int.index(i))])
-    axs_1[(list_int.index(i))].axis('off')
+    axs_1[pos].set_title(readable_titles[pos])
+    axs_1[pos].axis('off')
+plt.savefig('Chloropleth_Social.png')
 plt.show()
 
 #how about we use scatter plots for comparision
@@ -89,27 +92,32 @@ fig_2,axs_2=plt.subplots(nrows=2,ncols=3,figsize=(35,15))
 axs_2=axs_2.flatten()
 
 list_int_min=["POP_5_YRS_AND_OLDER","PTL_ADULT_NOLEISUREPHYSACTIV","PTL_LESS_BACHELOR_DEGREE"]
-readable_titles_min=["Population over 5","Adults with no leisure activity(%)","Education less than degree(%)"]
+readable_titles_min=["Population over 5","Adults with no leisure activity (percentile)",
+                     "Education less than degree (percentile)"]
 
 for i in list_int_min:
+    #set a position variable
+    pos=(list_int_min.index(i))
+
     #a second order regression plot comparing all indicators against health indiactors
-    sns.regplot(ax=axs_2[(list_int_min.index(i))],fit_reg=True,x="HI_score",y=i,data=gp_df_clean,order=2)
+    sns.regplot(ax=axs_2[pos],fit_reg=True,x="HI_score",y=i,data=gp_df_clean,order=2)
 
     #a residual plot so that we can visually see how well the data fits against the second order regression
-    sns.residplot(ax=axs_2[(list_int_min.index(i))+3],x="HI_score",y=i,data=gp_df_clean,order=2)
+    sns.residplot(ax=axs_2[pos+3],x="HI_score",y=i,data=gp_df_clean,order=2)
 
     #set titles for the first three regression plots
-    axs_2[(list_int_min.index(i))].set_title('Regression plot')
-    axs_2[(list_int_min.index(i))].set_ylabel(readable_titles_min[(list_int_min.index(i))])
-    axs_2[(list_int_min.index(i))].set_xlabel(readable_titles[0])
+    axs_2[pos].set_title('Regression plot')
+    axs_2[pos].set_ylabel(readable_titles_min[pos])
+    axs_2[pos].set_xlabel(readable_titles[0])
 
     #set titles for the next residual plots
-    axs_2[(list_int_min.index(i))+3].set_title('Residual plot')
-    axs_2[(list_int_min.index(i)) + 3].set_ylabel("Residuals")
-    axs_2[(list_int_min.index(i)) + 3].set_xlabel(readable_titles[0])
+    axs_2[pos+3].set_title('Residual plot')
+    axs_2[pos + 3].set_ylabel("Residuals")
+    axs_2[pos + 3].set_xlabel(readable_titles[0])
 
 #plot and save the subplots as a png
 plt.savefig('Social_Factors.png')
+plt.savefig('Social_Regression.png')
 plt.show()
 
 '''I think it would be interesting to find a mean abs error for this fit. The way I know how to do this is by defining 
@@ -141,23 +149,40 @@ for i in list_int_min:
 # we can use population under poverty act as an indicator of wealth
 
 wealth_list=["PTL_POP_UNDER200PCT_POVERTY", "HEALTH_DISADV_SCORE"]
+wealth_list_readable=["population under 200% poverty(percentile)","Health disadvantage score"]
 fig_3,axs_3=plt.subplots(nrows=2,ncols=2,figsize=(15,15))
 axs_3=axs_3.flatten()
 
-#1,2 chloropleth maps
-#4th box plot
+# The last plot will be a box plot, we need to use the melt function on the two relevant columns
 box_df=gp_df_clean[["PTL_POP_UNDER200PCT_POVERTY", "HEALTH_DISADV_SCORE"]]
 box_melt_df=pd.melt(box_df)
-#3rd scatter plot
+
 
 for i in wealth_list:
-    gp_df_clean.plot(ax=axs_3[(wealth_list.index(i))], column=i, cmap='Blues', legend=True,edgecolor='black')
-    axs_3[(wealth_list.index(i))].set_title(i)
-    axs_3[(wealth_list.index(i))].axis('off')
+    #set a position variable
+    pos=(wealth_list.index(i))
+
+    #the first two plots will be chloropleths of Seatle
+    gp_df_clean.plot(ax=axs_3[pos], column=i, cmap='Blues', legend=True,edgecolor='black')
+
+    #the title of each plot should be relevant
+    axs_3[pos].set_title(wealth_list_readable[pos])
+    axs_3[pos].axis('off')
+
+#only one subplot (can be outside loop) this time lets make it first order
 sns.regplot(ax=axs_3[2],fit_reg=True,x=wealth_list[0],y=wealth_list[1],data=gp_df_clean)
-axs_3[2].set_title("Scatter Plot")
+
+#set relevant titles for regression plot
+axs_3[2].set_title("First Order Regression Plot")
+axs_3[2].set_ylabel(wealth_list_readable[1])
+axs_3[2].set_xlabel(wealth_list_readable[0])
+
+#define box plot with special themes
 sns.boxplot(ax=axs_3[3],x='variable',y='value',data=box_melt_df,color=".8", linecolor="#137", linewidth=.75)
+
+#set titles for box plot
 axs_3[3].set_title("Box Plot")
+plt.savefig('SUBPLOTS_ECON.png')
 plt.show()
 
 sns.set(rc={'figure.figsize':(11.7,8.27)})
@@ -166,12 +191,16 @@ AX=sns.scatterplot(x=wealth_list[0],y=wealth_list[1],data=gp_df_clean,
                 sizes=(50,150))
 legend_handles, _=AX.get_legend_handles_labels()
 AX.legend(legend_handles,["Highest Equity Priority", "Second Highest", "Middle", "Second Lowest",
-                 "Lowest"],bbox_to_anchor=(1,1),title="legend")
+                 "Lowest"],bbox_to_anchor=(1,1),title="Race/Origins Quantile")
 plt.xlabel('Health Disadvantage Score')
-plt.ylabel('Percentage of population under 200% of poverty level')
+plt.ylabel('Percentile of population under 200% of poverty level')
+plt.savefig('SCATTER_ECON.png')
 plt.show()
 
 axs_4=sns.swarmplot(data=gp_df_clean,x="RACE_ELL_ORIGINS_QUINTILE",y="SOCIOECON_DISADV_PERCENTILE",hue="HEALTH_DISADV_QUINTILE")
+axs_4.legend(legend_handles,["Highest Equity Priority/Most Disadvantaged", "Second Highest", "Middle", "Second Lowest",
+                 "Lowest"],title="Health Disadvantage Quantile")
+plt.savefig('SWARM_ECON.png')
 plt.show()
 
 
