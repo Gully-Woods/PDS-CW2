@@ -106,7 +106,6 @@ plt.show()
 '''I think it would be interesting to find a mean abs error for this fit. The way I know how to do this is by defining 
 a function for the second order and using scipy to see how this regression fits with the residuals of the columns as 
 numpy arrays'''
-
 # defining the second order func
 def second_order(x,c,m1,m2):
     return c+m1*x+m2*x**2
@@ -164,16 +163,18 @@ sns.set(rc={'figure.figsize':(11.7,8.27)})
 AX=sns.scatterplot(x=wealth_list[0],y=wealth_list[1],data=gp_df_clean,
                 hue="RACE_ELL_ORIGINS_QUINTILE",size="RACE_ELL_ORIGINS_QUINTILE",
                 sizes=(50,150))
+
 # Lets define the legend more specifical to set position and also control the output so that they are not just
 # incomprehensable numbers
 legend_handles, _=AX.get_legend_handles_labels()
 AX.legend(legend_handles,["Highest Equity Priority", "Second Highest", "Middle", "Second Lowest",
                  "Lowest"],bbox_to_anchor=(1,1),title="Race/Origins Quantile")
-# define the labels
+#define the labels
 plt.xlabel('Health Disadvantage Score')
 plt.ylabel('Percentile of population under 200% of poverty level')
 plt.savefig('SCATTER_ECON.png')
 plt.show()
+
 
 # Let us investigate race and origin further by investigating the relationship wiht a swarmplot against social economic
 # disadvantage we can also create a different 'hue' for social healdisadvantage
@@ -183,7 +184,7 @@ axs_4.legend(legend_handles,["Highest Equity Priority/Most Disadvantaged", "Seco
 #define the labels
 plt.xlabel('Race ')
 plt.ylabel('Percentile of population under 200% of poverty level')
-# plot the figure and save as a png
+#plot the figure and save as a png
 plt.savefig('SWARM_ECON.png')
 plt.show()
 
