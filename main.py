@@ -19,10 +19,10 @@ plt.show()
 '''I can turn quantile into a number scale this will help with analysis later.Say for Health Disadvantage each quantile
 can be mapped onto a dictonary that converts the string into a interger.'''
 
-# list the columns of intrest with the same catagories names
+# list the columns of interest with the same categories names
 Quantile_cols=['HEALTH_DISADV_QUINTILE','SOCIOECON_DISADV_QUINTILE']
 for i in Quantile_cols:
-    # create a dictonary so that we can give these values some abitary seperating numerical meaning
+    # create a dictionary so that we can give these values some arbitrary separating numerical meaning
     dict={"Highest Equity Priority/Most Disadvantaged":0,"Second Highest":1,"Middle":2,"Second Lowest":3,
                "Lowest":4}
     # map the values for each column to the dictonary
@@ -32,7 +32,7 @@ for i in Quantile_cols:
 # let's try this for the rest of our discrete quantile columns
 remaining_Quantile_cols=["RACE_ELL_ORIGINS_QUINTILE","COMPOSITE_QUINTILE"]
 for i in remaining_Quantile_cols:
-    # the dictonary is slightly different becuase the names of some of the strings have changed
+    # the dictionary is slightly different because the names of some of the strings have changed
     dict={"Highest Equity Priority":0 , "Second Highest":1, "Middle":2, "Second Lowest":3,
                  "Lowest":4}
     gp_df[i]=gp_df[i].map(dict)
@@ -47,7 +47,7 @@ individual at disavantange but we want to see how directly it relates to know is
 - To investigate if certain groups of people have been places at a disavantage we should relate this to the disadvantage 
 index
 '''
-# dropping columns to remove irrelvant info
+# dropping columns to remove irrelevant info
 gp_df_clean = gp_df.drop(['SHAPE_Length', 'TRACT','NAMELSAD','ACRES_TOTAL','OBJECTID','GEOID','SHAPE_Area','TRACTCE'], axis=1)
 # print all the new columns so that we can see them
 pd.set_option('display.max_columns',None)
@@ -137,7 +137,7 @@ box_melt_df=pd.melt(box_df)
 for i in wealth_list:
     # set a position variable
     pos=(wealth_list.index(i))
-    # the first two plots will be chloropleths of Seatle
+    # the first two plots will be choropleth's of Seatle
     gp_df_clean.plot(ax=axs_3[pos], column=i, cmap='Blues', legend=True,edgecolor='black')
     # the title of each plot should be relevant
     axs_3[pos].set_title(wealth_list_readable[pos])
@@ -198,19 +198,23 @@ mu_p,sigma_p=norm.fit(pop)
 # plot a histagram and the fit
 plt.hist(pop,35,density=True,label='histogram true')
 plt.plot(x,norm.pdf(x,mu_p,sigma_p),label='normal fit')
+# create axis labels
 plt.xlabel('Population 5 years and older')
 plt.ylabel('density')
+# plot the legend
 plt.legend()
+# plot the figure and save to a png
 plt.savefig('hist_fit.png')
 plt.show()
 # print the mean and standard deveation
 print('population average=',"%.3g" %mu_p)
 print('population standard devation=',"%.3g" %sigma_p)
 
+# create suplots for kedal density plots to analyse the density of other key variables
 fig_5,axs_5=plt.subplots(nrows=1,ncols=3,figsize=(14,4))
+#create lists for the columns and readable versions to itterate through in the loop
 inter_list_2= ["PTL_POP_UNDER200PCT_POVERTY","PTL_ADULT_NOLEISUREPHYSACTIV","PTL_LESS_BACHELOR_DEGREE"]
-readable_inter_list_2=["Percentile of population under 200% poverty","Percentile adults with no leisure or physical"
-                                                                     "activity","Percentile with less than degree"]
+readable_inter_list_2=["Percentile of population under 200% poverty","Percentile adults with no leisure or physical"]                                                                    "activity","Percentile with less than degree"]
 for i in inter_list_2:
     # set a position variable
     pos = (inter_list_2.index(i))
@@ -219,7 +223,7 @@ for i in inter_list_2:
     # set axis titles
     axs_5[pos].set_ylabel("Density")
     axs_5[pos].set_xlabel(readable_inter_list_2[pos])
-
+#plot and save the figure to a new png
 plt.savefig('kend_dens.png')
 plt.show()
 
